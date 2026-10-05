@@ -1,0 +1,25 @@
+# Local tools and generated files
+node_modules/
+coverage/
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+
+# Keep personal exported decisions outside the published example set
+/tilttrace.json
+/decisions/
+tilttrace-decision*.json

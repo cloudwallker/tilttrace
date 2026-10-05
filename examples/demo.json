@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "title": "Choose a place to work",
+  "criteria": [
+    {"name": "Focus", "weight": 40, "locked": false},
+    {"name": "Cost", "weight": 30, "locked": false},
+    {"name": "Commute", "weight": 20, "locked": false},
+    {"name": "Flexibility", "weight": 10, "locked": false}
+  ],
+  "options": [
+    {"name": "Quiet studio", "scores": [9, 4, 8, 5]},
+    {"name": "Shared hub", "scores": [6, 8, 7, 9]},
+    {"name": "Home desk", "scores": [5, 10, 10, 3]}
+  ]
+}

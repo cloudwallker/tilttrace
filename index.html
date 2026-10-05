@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TiltTrace — an offline lab for the smallest preference shift that makes a decision lose its lead.">
+  <meta name="color-scheme" content="light">
+  <title>TiltTrace · 倾向轨迹</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23163332'/%3E%3Cpath d='M7 22L16 9l9 13M11 22h10' fill='none' stroke='%23e7ad72' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="engine.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#workspace" data-i18n="skip">跳到实验区</a>
+  <header class="masthead">
+    <a class="brand" href="index.html" aria-label="TiltTrace">
+      <svg viewBox="0 0 38 38" aria-hidden="true"><rect width="38" height="38" rx="11"/><path d="M9 27L19 10l10 17M13 27h12"/></svg>
+      <span>TiltTrace<span class="brand-sub" data-i18n="brandSub">倾向轨迹</span></span>
+    </a>
+    <div class="toolbar">
+      <span class="offline"><i></i><span data-i18n="offline">离线 · 零依赖</span></span>
+      <button id="language" class="quiet" type="button" aria-label="Switch to English">EN</button>
+      <button id="import" class="quiet" type="button" data-i18n="import">导入</button>
+      <button id="export" class="export" type="button" data-i18n="export">导出 JSON ↗</button>
+      <input id="file" type="file" accept=".json,application/json" hidden>
+    </div>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="headline">
+      <div>
+        <p class="eyebrow" data-i18n="eyebrow">A LAB FOR THE MOMENT YOU CHANGE YOUR MIND</p>
+        <h1 id="headline" data-i18n="headline">一个选择，<br>离改变主意有多远？</h1>
+        <p class="lead" data-i18n="lead">找出让首选失去领先的最小偏好变化。每个结果，都有一条可以重放的轨迹。</p>
+      </div>
+      <div class="distance-card" aria-live="polite">
+        <p class="eyebrow" data-i18n="nearest">距最近的追平边界</p>
+        <div class="big-distance"><span id="distance">—</span><span class="unit" id="distance-unit">pp</span></div>
+        <p id="distance-note"></p>
+        <div class="distance-bottom"><span class="line-symbol" aria-hidden="true">● ───── ◇</span><span data-i18n="distanceDefinition">pp = 重新分配的权重点数</span></div>
+      </div>
+    </section>
+    <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+    <section id="workspace" class="workspace" aria-label="Decision workspace">
+      <div class="section-head">
+        <div><span class="step">01</span><h2 data-i18n="yourLens">你的偏好镜头</h2></div>
+        <button id="reset" class="text-button" type="button" data-i18n="reset">恢复示例 ↺</button>
+      </div>
+      <div class="work-grid">
+        <section class="weights-panel" aria-label="Criteria weights">
+          <label class="field-label" for="decision-title" data-i18n="decisionTitle">这次要决定什么</label>
+          <input id="decision-title" class="title-input" maxlength="120" autocomplete="off">
+          <p class="hint" data-i18n="weightHint">权重总和始终为 100%。锁定你不能妥协的标准。</p>
+          <div id="weights"></div>
+          <div class="weight-total"><span data-i18n="total">合计</span><strong id="total">100.0%</strong><span id="locked-count"></span></div>
+        </section>
+        <section class="ranking-panel" aria-labelledby="ranking-heading">
+          <p class="eyebrow" id="ranking-heading" data-i18n="currentLeader">当前首选</p>
+          <h3 id="leader-name"></h3>
+          <div class="leader-score"><span id="leader-score"></span><span>/ 10</span></div>
+          <div id="ranking"></div>
+          <p class="ranking-note" data-i18n="rankingNote">排名来自你给出的分数与偏好。分值越高，代表越符合你的需要。</p>
+        </section>
+      </div>
+    </section>
+    <section class="boundary-section" aria-labelledby="boundary-heading">
+      <div class="section-head">
+        <div><span class="step">02</span><h2 id="boundary-heading" data-i18n="boundaries">让选择动摇的轨迹</h2></div>
+        <button id="undo" class="text-button" type="button" data-i18n="undo" disabled>撤回上次预览 ↶</button>
+      </div>
+      <p class="section-note" data-i18n="boundaryHint">保持分数不变，只转移未锁定的权重。这里计算追平初始首选的边界；另一个选项仍可能排得更高。</p>
+      <div id="boundaries" class="boundary-grid"></div>
+    </section>
+    <section class="score-section" aria-labelledby="score-heading">
+      <div class="section-head"><div><span class="step">03</span><h2 id="score-heading" data-i18n="scores">给每个选择打分</h2></div><span class="small-note" data-i18n="scoreScale">0–10 · 越高越好</span></div>
+      <p class="section-note" data-i18n="scoreHint">点选名称和分值即可编辑。成本、耗时等负向指标，请先转换成满意度分数。</p>
+      <div class="table-wrap" tabindex="0" id="score-table-wrap"><table id="scores"></table></div>
+    </section>
+    <footer>
+      <span data-i18n="privacy">仅在当前页面内存中计算 · 无账号、无上传、无自动保存</span>
+      <a href="docs/METHOD.md" data-i18n="method">计算方法 ↗</a>
+      <span>TiltTrace / MIT</span>
+    </footer>
+  </main>
+</body>
+</html>
