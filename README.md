@@ -95,3 +95,7 @@ No `npm install` is needed. Tests use Node's built-in test runner. GitHub Action
 ## License
 
 [MIT](LICENSE) · Copyright (c) 2026 [cloudwallker](https://github.com/cloudwallker)
+
+## Interface
+
+An offline preference-boundary lab with readable decision traces, larger controls, visible keyboard focus, and layouts that adapt to small screens.

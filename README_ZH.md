@@ -95,3 +95,7 @@ npm test
 ## 许可证
 
 [MIT](LICENSE) · Copyright (c) 2026 [cloudwallker](https://github.com/cloudwallker)
+
+## 界面体验
+
+离线偏好边界实验工具，提供易读的决策轨迹、更易操作的控件、可见键盘焦点和适配小屏幕的布局。
