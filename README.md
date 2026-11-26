@@ -8,9 +8,9 @@ A zero-dependency, offline decision sensitivity lab.
 
 ![TiltTrace showing a synthetic workplace decision](assets/demo.jpg)
 
-TiltTrace is a small, offline decision sensitivity lab. Score your options, assign weights, and inspect the smallest weight redistribution that lets each challenger catch the current leader. Every reachable result includes a concrete set of weights you can apply and check.
+TiltTrace is a small, offline decision sensitivity lab. Score your options, assign weights, and inspect the smallest weight redistribution that lets each challenger catch the current leader. When options share first place, you can compare against any of them. Every reachable result includes a concrete set of weights you can apply and check.
 
-**中文简介：** TiltTrace 是零依赖的离线决策敏感性实验室，计算让其他方案追平当前首选所需的最少权重重分配，并提供可复验的权重见证。
+**中文简介：** TiltTrace 是零依赖的离线决策敏感性实验室，可选择并列首选作为比较基准，计算其他方案追平它所需的最少权重转移，并提供可复验的权重方案。
 
 ## Why TiltTrace
 
@@ -28,7 +28,7 @@ Weighted scoring and sensitivity analysis already exist. TiltTrace's focus is th
 1. Download the repository ZIP and extract it.
 2. Double-click `index.html` to open it in a modern browser. You can disconnect from the network.
 3. Rename the decision, criteria, and options; edit scores and move the weight sliders.
-4. Lock any fixed weights, then inspect a challenger's catch-up boundary and preview its witness.
+4. Lock any fixed weights. If several options share first place, use **Compare challengers against** to pick a baseline. Inspect a challenger's boundary and replay its weights.
 5. Export JSON to keep your work. Refreshing or closing the page discards the in-memory decision.
 
 All scores are subjective ratings from **0 to 10, with higher always better**. For `Cost`, rate affordability or satisfaction rather than entering a price. For `Commute`, a higher score means a better commute. Changing a weight redistributes the remaining unlocked weights proportionally; if they are all zero, the remainder is shared equally.
