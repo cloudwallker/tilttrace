@@ -8,9 +8,9 @@ A zero-dependency, offline decision sensitivity lab.
 
 ![TiltTrace 合成办公地点决策演示](assets/demo.jpg)
 
-TiltTrace 是轻量、离线的决策敏感性实验室。为方案打分并分配权重后，它计算每个竞争方案追平当前首选所需的最少权重重分配。可追平的结果附有可以直接应用、复验的具体权重。
+TiltTrace 是轻量、离线的决策敏感性实验室。为方案打分并分配权重后，它计算每个竞争方案追平当前首选最少要转移多少权重。多个方案并列第一时，可选其中任一个作为比较基准。可追平的结果附有可以直接应用、复验的具体权重。
 
-**English description:** TiltTrace is a zero-dependency, offline decision sensitivity lab that finds the minimum weight redistribution needed to tie the current leader, with replayable numerical witnesses.
+**English description:** TiltTrace is a zero-dependency, offline decision sensitivity lab that finds the minimum weight redistribution needed to tie a chosen first-place option and provides weights you can replay.
 
 ## 主要功能
 
@@ -28,7 +28,7 @@ TiltTrace 是轻量、离线的决策敏感性实验室。为方案打分并分�
 1. 下载仓库 ZIP 并解压。
 2. 双击 `index.html`，用现代浏览器打开；断网也能使用。
 3. 修改标题、标准和方案名称，编辑分数，拖动权重滑条。
-4. 锁定固定权重，查看竞争方案的追平边界并预览见证。
+4. 锁定固定权重。若有多个方案并列第一，在“用于比较的首选”中选择基准，然后查看其他方案的追平边界并重放权重。
 5. 导出 JSON 保存。刷新或关闭页面会丢弃内存中的决策。
 
 所有分数都是 **0–10 的主观评价，越高越好**。`Cost` 应填写对价格或负担能力的满意度，而非金额；`Commute` 分数越高表示通勤越理想。修改一个权重时，其余未锁定权重按原有比例分配剩余份额；若它们原来全为零，则平均分配。

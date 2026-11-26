@@ -13,7 +13,7 @@
       lead:'找出让首选失去领先的最小偏好变化。每个结果，都有一条可以重放的轨迹。',
       nearest:'距最近的追平边界',distanceDefinition:'pp = 重新分配的权重点数',yourLens:'你的偏好镜头',
       reset:'恢复示例 ↺',decisionTitle:'这次要决定什么',weightHint:'权重总和始终为 100%。锁定你不能妥协的标准。',
-      total:'合计',currentLeader:'当前首选',rankingNote:'排名来自你给出的分数与偏好。分值越高，代表越符合你的需要。',
+      total:'合计',currentLeader:'当前首选',jointLeaders:'并列首选',baseline:'用于比较的首选',rankingNote:'排名来自你给出的分数与偏好。分值越高，代表越符合你的需要。',
       boundaries:'让选择动摇的轨迹',undo:'撤回上次预览 ↶',boundaryHint:'保持分数不变，只转移未锁定的权重。这里计算追平初始首选的边界；另一个选项仍可能排得更高。',
       scores:'给每个选择打分',scoreScale:'0–10 · 越高越好',scoreHint:'点选名称和分值即可编辑。成本、耗时等负向指标，请先转换成满意度分数。',
       privacy:'仅在当前页面内存中计算 · 无账号、无上传、无自动保存',method:'计算方法 ↗',
@@ -34,7 +34,7 @@
       lead:'Find the smallest preference shift that costs your choice its lead. Every result comes with a trace you can replay.',
       nearest:'NEAREST TIE BOUNDARY',distanceDefinition:'pp = weight points reallocated',yourLens:'Your preference lens',reset:'Reset example ↺',
       decisionTitle:'THE DECISION ON YOUR DESK',weightHint:'Weights always add up to 100%. Lock the criteria you cannot compromise on.',
-      total:'Total',currentLeader:'CURRENT FIRST CHOICE',rankingNote:'The ranking reflects your scores and preferences. Higher scores mean a better fit for your needs.',
+      total:'Total',currentLeader:'CURRENT FIRST CHOICE',jointLeaders:'TIED FIRST CHOICES',baseline:'Compare challengers against',rankingNote:'The ranking reflects your scores and preferences. Higher scores mean a better fit for your needs.',
       boundaries:'Traces that challenge your choice',undo:'Undo last replay ↶',
       boundaryHint:'Keep scores fixed and move only unlocked weight. Each boundary ties the initial leader; a third option may still rank higher.',
       scores:'Score each possibility',scoreScale:'0–10 · Higher is better',scoreHint:'Edit names and scores directly. Convert costs or time into satisfaction scores first.',
@@ -52,7 +52,7 @@
       fileLarge:'The file must be at most 64 KiB.',badScore:'Scores must be numbers between 0 and 10.',
       badName:'Names must contain 1–60 characters.',badTitle:'The title must contain 1–120 characters.'}
   };
-  let lang = 'zh', model = engine.validateModel(DEMO), previous = null;
+  let lang = 'zh', model = engine.validateModel(DEMO), previous = null, baselineIndex = null;
   const $ = id => document.getElementById(id);
   const t = key => words[lang][key];
   const fmt = (n, digits=2) => Number(n).toFixed(digits);
@@ -103,19 +103,34 @@
     syncWeights();
   }
   function renderResults() {
-    const result=engine.analyze(model), nearest=result.boundaries.find(b=>b.reachable);
-    $('leader-name').textContent=result.leader.name;
-    $('leader-score').textContent=fmt(result.leader.score);
+    const result=engine.analyze(model,baselineIndex), nearest=result.boundaries.find(b=>b.reachable);
+    const leaders=result.groups[0];
+    if(result.leader.index!==baselineIndex)baselineIndex=null;
+    $('ranking-heading').textContent=t(leaders.length>1?'jointLeaders':'currentLeader');
+    $('leader-name').textContent=leaders.map(item=>item.name).join(lang==='zh'?'、':', ');
+    $('leader-score').textContent=fmt(leaders[0].score);
+    $('baseline-picker').hidden=leaders.length===1;
+    const baseline=$('baseline');
+    baseline.replaceChildren();
+    for(const item of leaders){
+      const option=element('option',item.name);
+      option.value=String(item.index);baseline.append(option);
+    }
+    baseline.value=String(result.leader.index);
     $('distance').textContent=nearest?fmt(nearest.distance):'—';
     $('distance-unit').hidden=!nearest;
     $('distance-note').textContent=nearest?t('nearestNote')(model.options[nearest.challengerIndex].name,result.leader.name):t('noBoundary');
     $('ranking').replaceChildren();
-    result.ranking.forEach((item,i)=>{
-      const row=element('div',undefined,'ranking-row'), label=element('div',undefined,'ranking-label');
-      label.append(element('span',`${String(i+1).padStart(2,'0')}  ${item.name}`),element('span',fmt(item.score)));
-      const track=element('div',undefined,'ranking-track'),fill=element('div',undefined,'ranking-fill');
-      fill.style.width=(item.score*10)+'%';track.append(fill);row.append(label,track);$('ranking').append(row);
-    });
+    let place=1;
+    for(const group of result.groups){
+      for(const item of group){
+        const row=element('div',undefined,'ranking-row'), label=element('div',undefined,'ranking-label');
+        label.append(element('span',`${String(place).padStart(2,'0')}  ${item.name}`),element('span',fmt(item.score)));
+        const track=element('div',undefined,'ranking-track'),fill=element('div',undefined,'ranking-fill');
+        fill.style.width=(item.score*10)+'%';track.append(fill);row.append(label,track);$('ranking').append(row);
+      }
+      place+=group.length;
+    }
     $('boundaries').replaceChildren();
     result.boundaries.forEach(b=>{
       const card=element('article',undefined,'boundary');
@@ -132,7 +147,7 @@
         });
         const button=element('button',t('preview'),'preview');button.type='button';button.disabled=b.distance<1e-7;
         button.addEventListener('click',()=>{
-          previous=clone(model);model.criteria.forEach((c,i)=>{c.weight=b.witness[i];});
+          previous={model:clone(model),baselineIndex};model.criteria.forEach((c,i)=>{c.weight=b.witness[i];});
           render();say(t('previewed'));
         });
         card.append(button);
@@ -186,20 +201,21 @@
     renderWeights();renderResults();renderScores();
   }
   $('language').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';$('status').hidden=true;render();});
+  $('baseline').addEventListener('change',()=>{baselineIndex=Number($('baseline').value);renderResults();});
   $('decision-title').addEventListener('change',()=>{
     const value=$('decision-title').value.trim();
     if(!value || value.length>120){$('decision-title').value=model.title;say(t('badTitle'),true);return;}
     edit(()=>{model.title=value;});
   });
-  $('reset').addEventListener('click',()=>{model=engine.validateModel(DEMO);previous=null;render();say(t('resetDone'));});
-  $('undo').addEventListener('click',()=>{if(previous){model=previous;previous=null;render();say(t('undone'));}});
+  $('reset').addEventListener('click',()=>{model=engine.validateModel(DEMO);previous=null;baselineIndex=null;render();say(t('resetDone'));});
+  $('undo').addEventListener('click',()=>{if(previous){model=previous.model;baselineIndex=previous.baselineIndex;previous=null;render();say(t('undone'));}});
   $('import').addEventListener('click',()=>$('file').click());
   $('file').addEventListener('change',async()=>{
     const file=$('file').files[0];if(!file)return;
     try{
       if(file.size>65536)throw new Error(t('fileLarge'));
       const next=engine.validateModel(JSON.parse(await file.text()));
-      model=next;previous=null;render();say(t('loaded'));
+      model=next;previous=null;baselineIndex=null;render();say(t('loaded'));
     }catch(error){say(t('bad')+error.message,true);}
     $('file').value='';
   });

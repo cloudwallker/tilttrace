@@ -42,7 +42,9 @@ With no unlocked criteria, it is simply the current advantage. The engine uses a
 - `reachable = true`, `canWin = false`: equality is achievable, but a strict advantage is not (**tie-only**).
 - `canWin = true`: some feasible weights make the challenger strictly exceed the baseline leader. The minimum-distance witness still stops at equality.
 
-Strictly exceeding the baseline leader does not establish a global win. The replayed full ranking is the check for that. If several options currently tie, the baseline leader is selected by their original order; equal scores remain a tie, regardless of display order.
+Strictly exceeding the baseline leader does not establish a global win. The replayed full ranking is the check for that.
+
+The ranking uses unrounded scores. Options within `1e-9` of the highest score in their group share a place, so two leaders are both first and the next place is third. The default baseline is the highest-scoring option, with input order deciding exact ties. Selecting another first-place option recalculates every pairwise boundary using that baseline. Scores and weights stay the same. Replaying a boundary applies its weights, and undo restores both the previous weights and baseline choice.
 
 ## Hand calculation
 

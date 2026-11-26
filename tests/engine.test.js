@@ -216,6 +216,31 @@ test('rank and analyze reject malformed input instead of producing NaN results',
   assert.throws(() => engine.analyze(raw));
 });
 
+test('co-leaders share a place and either can serve as the comparison baseline', () => {
+  const raw = freeze(model([60, 40], [[5, 5], [3, 8], [6, 1]]));
+  const original = engine.analyze(raw);
+  const alternate = engine.analyze(raw, 1);
+  assert.deepEqual(original.groups.map(group => group.map(item => item.index)), [[0, 1], [2]]);
+  assert.deepEqual(alternate.ranking, original.ranking);
+  assert.equal(original.leader.index, 0);
+  assert.equal(alternate.leader.index, 1);
+  near(original.boundaries.find(b => b.challengerIndex === 2).distance, 20);
+  const witness = alternate.boundaries.find(b => b.challengerIndex === 2);
+  near(witness.distance, 10);
+  checkWitness(raw, witness, alternate.leader.index);
+  assert.equal(alternate.boundaries.find(b => b.challengerIndex === 0).distance, 0);
+  assert.equal(engine.analyze(raw, 2).leader.index, 0);
+});
+
+test('score tolerance is relative to the top of each place and independent of displayed rounding', () => {
+  const scores = [6, 6 - 0.7e-9, 6 - 1.4e-9, 5.999, 5.999];
+  const raw = model([50, 50], scores.map(score => [score, score]));
+  const result = engine.analyze(raw, 1);
+  assert.deepEqual(result.groups.map(group => group.map(item => item.index)), [[0, 1], [2], [3, 4]]);
+  assert.equal(result.leader.index, 1);
+  assert.equal(engine.analyze(raw, 2).leader.index, 0);
+});
+
 test('analyze returns a hand-calculated two-criterion minimum transfer and ranking leader object', () => {
   requireFunction('analyze');
   const raw = model();

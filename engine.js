@@ -126,10 +126,16 @@
     return { challengerIndex, distance, witness: weights, transfers, reachable: true, canWin, margin };
   }
 
-  function analyze(raw) {
+  function analyze(raw, preferredLeaderIndex) {
     const model = validateModel(raw);
     const ranked = ranking(model);
-    const leader = ranked[0];
+    const groups = [];
+    for (const item of ranked) {
+      const group = groups[groups.length - 1];
+      if (group && group[0].score - item.score <= SCORE_TOLERANCE) group.push(item);
+      else groups.push([item]);
+    }
+    const leader = groups[0].find(item => item.index === preferredLeaderIndex) || ranked[0];
     const boundaries = model.options.map((option, index) => index === leader.index ? null : boundary(model, leader, index))
       .filter((entry) => entry !== null)
       .sort((first, second) => {
@@ -137,7 +143,7 @@
         if (first.reachable) return first.distance - second.distance || first.challengerIndex - second.challengerIndex;
         return first.challengerIndex - second.challengerIndex;
       });
-    return { ranking: ranked, leader, boundaries };
+    return { ranking: ranked, groups, leader, boundaries };
   }
 
   function setWeight(raw, index, value) {

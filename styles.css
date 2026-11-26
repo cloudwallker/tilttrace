@@ -26,8 +26,11 @@ th, td { padding: 16px; }
 .boundary-card, .ranking-label, .section-note, .distance-card p, footer { overflow-wrap: anywhere; }
 .boundary-card { padding: 24px; }
 .ranking-label { gap: 16px; }
+#baseline-picker { margin: 16px 0; }
+#baseline-picker label { display: block; margin-bottom: 6px; }
+#baseline { max-width: 100%; min-height: 44px; padding: 4px 10px; font: inherit; color: var(--ink); background: var(--white); border-radius: 5px; }
 .work-grid > *, .boundary-grid > * { min-width: 0; }
-button:focus-visible, a:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
 @media (max-width: 900px) { .work-grid { grid-template-columns: 1fr; } .boundary-grid { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .weight-row { grid-template-columns: minmax(0, 1fr) 58px 58px; gap: 10px; } .criterion-name { grid-column: 1 / -1; } .intro h1 { font-size: 34px; } .section-head { flex-wrap: wrap; gap: 14px; } .lead, .ranking-note, .boundary-copy, .section-note { font-size: 14px; } .distance-bottom { flex-wrap: wrap; gap: 10px; } .ranking-panel { padding: 24px; } .title-input { font-size: 18px; } .weights-panel { padding: 22px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
